@@ -107,14 +107,14 @@ def Path_gradient(numpy_image, model, attr_objective, path_interpolation_func, c
                 grad[np.isnan(grad)] = 0.0
 
         grad_accumulate_list[i] = grad * lambda_derivative_interpolation[i]
-        result_list.append(result)
+        result_list.append(result.cpu().detach().numpy())
     results_numpy = np.asarray(result_list)
     return grad_accumulate_list, results_numpy, image_interpolation
 
 
 def saliency_map_PG(grad_list, result_list):
     final_grad = grad_list.mean(axis=0)
-    return final_grad, result_list[-1]
+    return final_grad, torch.tensor(result_list[-1])
 
 
 def saliency_map_P_gradient(
