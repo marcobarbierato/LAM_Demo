@@ -75,7 +75,7 @@ def LinearPath(fold):
     return path_interpolation_func
 
 
-def Path_gradient(numpy_image, model, attr_objective, path_interpolation_func, cuda=False):
+def Path_gradient(numpy_image, model, attr_objective, path_interpolation_func, cuda=False, clamp=False):
     """
     :param path_interpolation_func:
         return \lambda(\alpha) and d\lambda(\alpha)/d\alpha, for \alpha\in[0, 1]
@@ -107,7 +107,10 @@ def Path_gradient(numpy_image, model, attr_objective, path_interpolation_func, c
                 grad[np.isnan(grad)] = 0.0
 
         grad_accumulate_list[i] = grad * lambda_derivative_interpolation[i]
-        result_list.append(result.cpu().detach().numpy())
+        if clamp:
+            result_list.append(torch.clamp(result, min=0, max=1).cpu().detach().numpy())
+        else:
+            result_list.append(result.cpu().detach().numpy())
     results_numpy = np.asarray(result_list)
     return grad_accumulate_list, results_numpy, image_interpolation
 
